@@ -1,0 +1,92 @@
+{% load students_tags %}
+<style>
+  .right{
+    color: green;
+  }
+  .wrong{
+    color: red;
+  }
+</style>
+<hr>
+<div style="height:70px">
+  <p id="quiz_result">Result</p>
+</div>
+<hr>
+
+{% for question in item.questions.all %}
+  <h2>{{question.question}}</h2>
+  <form method="POST">
+    {% get_choices question %}
+  </form>
+{% endfor %}
+
+<script>
+  $(document).ready(function(){
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    var answer_count = 0;
+    var questions_count = "{{ questions_count|escapejs }}";
+    var count = 0;
+
+    $(document).on('click', '#button', function(event){
+      event.preventDefault();
+      let question_id = $(this).attr('name');
+      let id = $(this).attr('data-id');
+
+      // disable question choices
+      $("input[name=" + question_id + "]").prop('disabled', true);
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url "recive_student_answer" %}',
+        data: {'question_id': question_id, 'id': id, 'csrfmiddlewaretoken': csrftoken},
+        dataType: 'json',
+        success: function(response)
+        {
+          answer_count += 1;
+
+          $("input[data-id=" + response.right_choice_id + "]").addClass("right");
+          if (response.is_right)
+            count += 1;
+          else
+            $("input[data-id=" + id + "]").addClass("wrong");
+
+          if (answer_count == questions_count)
+            if (questions_count == count)
+            {
+              $('#quiz_result').text("You passed the quiz.");
+
+              $.ajax({
+                type: 'POST',
+                url: '{% url "save_student_progress" %}',
+                data: {'module_id': module_id, 'csrfmiddlewaretoken': csrftoken},
+                dataType: 'json',
+                success: function(response)
+                {
+                  console.log(response);
+                },
+              });
+            }
+            else
+              $('#quiz_result').text("You do not passed the quiz.");
+
+          },
+      });
+    });
+  });
+</script>

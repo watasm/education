@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}
+{% if object %}
+  Edit Quiz questions
+{% else %}
+  Add a new content
+{% endif %}
+{% endblock %}
+
+{% block content %}
+  <h1>Edit "{{ object.quiz.title }}" questions</h1>
+  <form action="." method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div> {{ form.as_p }} <hr></div>
+    <fieldset>
+      <legend>Question choices</legend>
+      {{ question_choices_formset.as_p }}
+      {{ question_choices_formset.management_form }}
+    </fieldset>
+    <input type="submit" value="Update data" class="submit" />
+  </form>
+{% endblock %}

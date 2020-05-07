@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "*"
+pillow = "*"
+django-braces = "*"
+django-embed-video = "*"
+python-memcached = "*"
+django-memcache-status = "*"
+psycopg2 = "*"
+uwsgi = "*"
+celery = "*"
+rabbitmq-server = "*"
+
+[requires]
+python_version = "3.6"

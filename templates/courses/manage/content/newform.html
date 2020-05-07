@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}
+{% if object %}
+  Edit content "{{ object.title }}"
+{% else %}
+  Add a new content
+{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class='module'>
+        <h1>
+          {% if object %}
+            Edit content "{{ object.title }}"
+          {% else %}
+            Add a new content
+          {% endif %}
+        </h1>
+
+        <form action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div> {{ form.as_p }} </div>
+            <input type="submit" value="Update data" class="submit" />
+        </form>
+    </div>
+
+    <div>
+      {% if object.questions %}
+        {% for question in object.questions.all %}
+          <li><a href="{% url 'quiz_questions_update' module_id object.id question.id %}">Edit question {{question.id}}</a></li>
+        {% empty %}
+          <p>No questions yet</p>
+        {% endfor%}
+        <a href="{% url 'quiz_questions_create' module_id object.id %}">Create question</a>
+      {% endif %}
+    </div>
+{% endblock %}

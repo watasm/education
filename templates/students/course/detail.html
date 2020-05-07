@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load students_tags %}
+{% load cache %}
+{% block title %}
+{{ object.title }}
+{% endblock %}
+{% block content %}
+  <h1>
+  {{ module.title }}
+  </h1>
+  <div class="contents">
+    <h3>Modules</h3>
+    <ul id="modules">
+      {% for m in object.modules.all %}
+        <li data-id="{{ m.id }}" {% if m == module %} class="selected" {% endif %}>
+          <a href='{% url "student_course_detail_module" object.id m.id %}'>
+            <span>Module <span class="order">{{ m.order|add:1 }}</span></span>
+            <br>
+            {{ m.title }}
+          </a>
+        </li>
+        {% for c in m.contents.all %}
+          <li data-id="{{ c.id }}" {% if m == module %} class="selected" {% endif %}>
+            <a href='{% url "student_course_detail_module_content" object.id m.id c.id %}'>
+              <span>-----Content <span class="order">{{ c.order|add:1 }}</span></span>
+              <br>
+              {{ c.title }}
+              {% is_learned request.user c %}
+            </a>
+          </li>
+        {% empty %}
+          <li>No contents yet.</li>
+        {% endfor %}
+      {% empty %}
+        <li>No modules yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="module">
+      {% if content %}
+        <h2>{{ content.item.title }}</h2>
+        {{ content.item.render }}
+
+        <!-- Cannot accsess to module.id in quiz.html. -->
+        <script type="text/javascript">
+          var module_id = "{{ module.id|escapejs }}"
+        </script>
+
+      {% else %}
+        <h2>Description</h2>
+        <p>{{module.description}}</p>
+      {% endif %}
+  </div>
+
+{% endblock %}
